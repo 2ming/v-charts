@@ -126,7 +126,10 @@ export const map = (columns, rows, settings, extra) => {
     mapGrid,
     itemStyle,
     positionJsonLink,
-    beforeRegisterMap
+    beforeRegisterMap,
+    beforeRegisterMapOnce,
+    mapURLProfix = 'https://unpkg.com/echarts@3.6.2/map/json/',
+    specialAreas = {}
   } = settings
   let metrics = columns.slice()
   if (settings.metrics) {
@@ -159,9 +162,14 @@ export const map = (columns, rows, settings, extra) => {
   }
   const series = getSeries(seriesParams)
 
-  return getMapJSON(position, positionJsonLink).then(json => {
+  return getMapJSON({
+    position,
+    positionJsonLink,
+    beforeRegisterMapOnce,
+    mapURLProfix
+  }).then(json => {
     if (beforeRegisterMap) json = beforeRegisterMap(json)
-    echarts.registerMap(position, json)
+    echarts.registerMap(position, json, specialAreas)
     return { series, tooltip, legend }
   })
 }

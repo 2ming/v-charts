@@ -1,4 +1,4 @@
-import { color, default as echarts } from './echarts-base'
+import { color } from './echarts-base'
 import { getType, toKebab, isArray, isObject } from './utils'
 import Loading from './components/loading'
 import DataEmpty from './components/data-empty'
@@ -91,6 +91,17 @@ export default {
       handler () {
         this.createEventProxy()
       }
+    },
+
+    theme: {
+      deep: true,
+      handler (v) {
+        this.themeChange(v)
+      }
+    },
+
+    themeName (v) {
+      this.themeChange(v)
     }
   },
 
@@ -199,6 +210,11 @@ export default {
 
       if (this.afterConfig) options = this.afterConfig(options)
       this.echarts.setOption(options, true)
+      this.$emit('ready', this.echarts)
+      if (!this._once['ready-once']) {
+        this._once['ready-once'] = true
+        this.$emit('ready-once', this.echarts)
+      }
       if (this.judgeWidth) this.judgeWidthHandler(options)
       if (this.afterSetOption) this.afterSetOption(this.echarts)
       if (this.afterSetOptionOnce && !this._once['afterSetOptionOnce']) {
@@ -235,10 +251,11 @@ export default {
 
     init () {
       if (this.echarts) return
-      const themeName = this.themeName || (this.theme ? 'outer-theme' : 've-chart')
+      const themeName = this.themeName || this.theme || 've-chart'
       this.echarts = this.echartsLib.init(this.$refs.canvas, themeName, this.initOptions)
       if (this.data) this.dataHandler(this.data)
       this.createEventProxy()
+      window.addEventListener('resize', this.echarts.resize)
     },
 
     addWatchToProps () {
@@ -246,7 +263,7 @@ export default {
       Object.keys(this.$props).forEach(prop => {
         if (!~watchedVariable.indexOf(prop)) {
           const opts = {}
-          if (getType(prop) === '[object Object]') {
+          if (getType(this.$props[prop]) === '[object Object]') {
             opts.deep = true
           }
           this.$watch(prop, () => {
@@ -254,10 +271,6 @@ export default {
           }, opts)
         }
       })
-    },
-
-    registerTheme () {
-      echarts.registerTheme('outer-theme', this.theme)
     },
 
     createEventProxy () {
@@ -278,6 +291,17 @@ export default {
           })(ev))
         }
       })
+    },
+
+    themeChange (theme) {
+      this.clean()
+      this.echarts = null
+      this.init()
+    },
+
+    clean () {
+      window.removeEventListener('resize', this.echarts.resize)
+      this.echarts.dispose()
     }
   },
 
@@ -286,16 +310,13 @@ export default {
     this.registeredEvents = []
     this._once = {}
     this.addWatchToProps()
-    if (this.theme) this.registerTheme()
   },
 
   mounted () {
     this.init()
-    window.addEventListener('resize', this.echarts.resize)
   },
 
   beforeDestroy () {
-    window.removeEventListener('resize', this.echarts.resize)
-    this.echarts.dispose()
+    this.clean()
   }
 }

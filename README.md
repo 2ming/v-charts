@@ -1,4 +1,4 @@
-# V-Charts
+# v-charts
 
 [![Build Status](https://travis-ci.org/ElemeFE/v-charts.svg?branch=master)](https://travis-ci.org/ElemeFE/v-charts)
 [![NPM downloads](http://img.shields.io/npm/dm/v-charts.svg)](https://npmjs.org/package/v-charts)
@@ -12,16 +12,17 @@
 痛点。基于Vue2.0和echarts封装的v-charts图表组件，只需要统一提供一种对前后端都友好的数据格式
 设置简单的配置项，便可轻松生成常见的图表。
 
-### 文档
-
-[https://elemefe.github.io/v-charts/](https://elemefe.github.io/v-charts/#/)
-
 ### 安装
 ---
 
 ```
-npm i v-charts -S
+npm i v-charts echarts -S
 ```
+
+### 文档
+---
+
+[v-charts.js.org](https://v-charts.js.org)
 
 ### 快速上手
 ---

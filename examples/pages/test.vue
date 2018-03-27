@@ -1,64 +1,54 @@
 <template>
-  <div class="page-test" :style="{ width: chartWidth }">
-    <ve-line
+  <div class="page-test">
+    <ve-map
       :data="chartData"
-      ref="chart"
-      :tooltipFormatter="tooltipFormatter"
-      :settings="chartSettings"
-      :width-change-delay="1500"
-      :after-config="afterConfig">
-    </ve-line>
+      :settings="chartSettings">
+    </ve-map>
+    <button @click="toggle">切换</button>
   </div>
 </template>
 
 <script>
-import VeLine from '../../src/packages/line'
-import 'echarts/lib/component/toolbox'
+import VeMap from '../../src/packages/map'
 
 export default {
   data () {
     this.chartSettings = {
-      xAxisType: 'value'
+      position: 'china',
+      dataType: {
+        'GDP': 'KMB'
+      },
+      beforeRegisterMapOnce (map) {
+        console.log('beforeRegisterMapOnce')
+        return map
+      },
+      beforeRegisterMap (map) {
+        console.log('beforeRegisterMap')
+        return map
+      },
+      mapURLProfix: 'https://unpkg.com/echarts@3.6.2/map/json/'
     }
     return {
       chartData: {
-        columns: ['日期', '余额', '年龄'],
+        columns: ['位置', 'GDP'],
         rows: [
-          { '日期': 1, '余额': 2123, '年龄': 300 },
-          { '日期': 10, '余额': 123, '年龄': 600 },
-          { '日期': 20, '余额': 1323, '年龄': 900 },
-          { '日期': 50, '余额': 4123, '年龄': 1200 },
-          { '日期': 100, '余额': 3223, '年龄': 1500 },
-          { '日期': 120, '余额': 123, '年龄': 2000 }
+          { '位置': '吉林', 'GDP': 123 },
+          { '位置': '北京', 'GDP': 1223 },
+          { '位置': '上海', 'GDP': 2123 },
+          { '位置': '浙江', 'GDP': 4123 }
         ]
-      },
-      chartWidth: '0'
+      }
     }
   },
 
   methods: {
-    afterConfig (options) {
-      // console.log(options)
-      return options
-    },
-    tooltipFormatter () {
-      console.log(arguments)
-      return 1
+    toggle () {
+      console.log('toggle')
+      const firstData = this.chartData.rows[0]
+      firstData['GDP'] = firstData['GDP'] === 123 ? 234 : 123
     }
   },
 
-  mounted () {
-    setTimeout(() => {
-      this.chartWidth = '100px'
-    }, 1000)
-  },
-
-  components: { VeLine }
+  components: { VeMap }
 }
 </script>
-
-<style>
-.page-test .ve-line {
-  width: 0;
-}
-</style>
